@@ -1,13 +1,20 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Healthcare App</title>
+  <meta charset="utf-8" />
+  <title>Healthcare API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body>
-    <h2>Upload Patient Report</h2>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <button type="submit">Upload</button>
-    </form>
+  <h2>Healthcare API</h2>
+  <p>Endpoints:</p>
+  <ul>
+    <li>POST /auth/register</li>
+    <li>POST /auth/login</li>
+    <li>GET /auth/me (JWT)</li>
+    <li>GET/POST /patients (JWT)</li>
+    <li>GET/PUT/DELETE /patients/&lt;id&gt; (JWT)</li>
+    <li>GET/POST/DELETE /appointments (JWT)</li>
+  </ul>
 </body>
 </html>
