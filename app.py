@@ -16,4 +16,9 @@ def upload_file():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    import os
+
+    # Only enable debug if explicitly set via environment variable
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+    host = "0.0.0.0" if os.getenv("ENV") == "docker" else "127.0.0.1"
+    app.run(debug=debug_mode, host=host, port=5000)
