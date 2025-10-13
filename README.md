@@ -1,116 +1,86 @@
-# 🏥 Healthcare API
+# 🏥 HealthCare App
 
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
+![CI/CD](https://github.com/slimbentanfous/HealthCare-app/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/slimbentanfous/HealthCare-app/branch/master/graph/badge.svg)](https://codecov.io/gh/slimbentanfous/HealthCare-app)
+![Docker Pulls](https://img.shields.io/docker/pulls/slimbentanfous1/healthcare-app)
+![Python](https://img.shields.io/badge/python-3.11-blue)
 
-## 📖 Table des matières
-- [Aperçu](#-aperçu)
-- [Architecture](#-architecture)
-- [Installation](#-installation)
-- [Utilisation](#-utilisation)
-- [Endpoints](#-endpoints)
-- [Technologies](#-technologies)
-- [License](#-license)
-
----
-
-## 🔎 Aperçu
-Cette API RESTful gère les **patients d’un système de santé**.  
-Elle inclut :
-- ✅ Authentification JWT (login/register)
-- ✅ CRUD complet pour les patients
-- ✅ Base de données PostgreSQL
-- ✅ Déploiement via Docker & docker-compose
+## 📌 Description
+**HealthCare App** est une API REST sécurisée permettant de gérer :
+- 🔐 Authentification avec JWT  
+- 👩‍⚕️ Gestion des patients  
+- 📅 Gestion des rendez-vous  
+- 🛡️ Tests unitaires avec `pytest` + couverture envoyée sur **Codecov**  
+- 🐳 Déploiement containerisé via **Docker Hub**
 
 ---
 
-## 🏗 Architecture
+## ⚙️ Stack Technique
+- **Backend** : Flask (Python 3.11)  
+- **Database** : PostgreSQL  
+- **Auth** : JWT (flask-jwt-extended)  
+- **CI/CD** : GitHub Actions + Codecov + Docker Hub  
 
-```mermaid
-flowchart LR
-    Client([Client / Frontend]) --> API[Flask API 🐍]
-    API --> DB[(PostgreSQL 🐘)]
+---
+
+## 🚀 Installation & Lancement
+
+### 1️⃣ Cloner le repo
+```bash
+git clone https://github.com/slimbentanfous/HealthCare-app.git
+cd HealthCare-app
+```
+
+### 2️⃣ Lancer avec Docker
+```bash
+docker-compose up -d --build
+```
+
+API disponible sur :  
+👉 `http://localhost:5000`
+
+---
+
+## 🧪 Tests
+Exécuter les tests avec couverture :
+```bash
+docker-compose exec api pytest --cov=. --cov-report=term
 ```
 
 ---
 
-## ⚙️ Installation
+## 📦 Docker Hub
+Images disponibles ici :  
+🔗 [Docker Hub - slimbentanfous1/healthcare-app](https://hub.docker.com/r/slimbentanfous1/healthcare-app)
 
-1. **Cloner le repo**
-   ```bash
-   git clone https://github.com/ton-profil/Healthcare-app.git
-   cd Healthcare-app
-   ```
+```bash
+# Dernière version
+docker pull slimbentanfous1/healthcare-app:latest
 
-2. **Configurer l’environnement**  
-   Crée un fichier `.env` :
-   ```env
-   POSTGRES_USER=admin
-   POSTGRES_PASSWORD=adminpassword
-   POSTGRES_DB=healthcare
-   DATABASE_URL=postgresql://admin:adminpassword@db:5432/healthcare
-   JWT_SECRET_KEY=supersecretkey
-   FLASK_ENV=development
-   ```
-
-3. **Lancer avec Docker**
-   ```bash
-   docker-compose up --build
-   ```
-
-Ton API sera dispo sur 👉 [http://127.0.0.1:5000](http://127.0.0.1:5000)
+# Version spécifique
+docker pull slimbentanfous1/healthcare-app:1.0.0
+```
 
 ---
 
-## 🚀 Utilisation
+## 🛠 Endpoints Principaux
 
-### 🔑 Authentification
-- **Register**  
-  `POST /auth/register`  
-  ```json
-  {
-    "username": "slim",
-    "password": "mypassword"
-  }
-  ```
-
-- **Login**  
-  `POST /auth/login`  
-  ```json
-  {
-    "username": "slim",
-    "password": "mypassword"
-  }
-  ```
-
-  ➡️ Retourne un `access_token` JWT
-
----
-
-## 🧑‍⚕️ Endpoints
-
-- `POST /auth/register` → Inscription utilisateur  
-- `POST /auth/login` → Connexion utilisateur  
+- `POST /auth/register` → Créer un compte  
+- `POST /auth/login` → Connexion (JWT)  
 - `GET /patients/` → Liste des patients  
-- `POST /patients/` → Ajouter un patient  
-- `GET /patients/{id}` → Détails d’un patient  
-- `PUT /patients/{id}` → Modifier un patient  
-- `DELETE /patients/{id}` → Supprimer un patient  
+- `POST /patients/` → Créer un patient  
+- `GET /appointments/` → Liste des rendez-vous  
+- `POST /appointments/` → Créer un rendez-vous  
 
 ---
 
-## 🛠 Technologies
-
-- [Flask](https://flask.palletsprojects.com/) – API REST  
-- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/) – Authentification JWT  
-- [PostgreSQL](https://www.postgresql.org/) – Base de données  
-- [Docker](https://www.docker.com/) – Conteneurisation  
+## ✨ Badges
+- ✅ Tests automatisés avec GitHub Actions  
+- 📊 Couverture Codecov  
+- 🐳 Image disponible sur Docker Hub  
 
 ---
 
-## 📜 License
-
-Distribué sous licence **MIT**.  
-Tu peux utiliser, modifier et partager librement 🚀.
+## 👨‍💻 Auteur
+Projet développé par **Slim Ben Tanfous**  
+🔗 [LinkedIn](https://www.linkedin.com/in/slim-ben-tanfous-971b19244/) | 🔗 [GitHub](https://github.com/slimbentanfous)
