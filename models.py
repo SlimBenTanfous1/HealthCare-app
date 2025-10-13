@@ -21,7 +21,8 @@ class Patient(db.Model):
     name = db.Column(db.String(120), nullable=False, index=True)
     age = db.Column(db.Integer, nullable=False)
     diagnosis = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)

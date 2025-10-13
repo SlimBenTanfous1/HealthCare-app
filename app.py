@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template
 from dotenv import load_dotenv
-from extensions import db, jwt
+from extensions import db, jwt, migrate
 from routes.auth import auth_bp
 from routes.patients import patients_bp
 from routes.appointments import appointments_bp
@@ -21,6 +21,7 @@ def create_app():
     # --- Init extensions ---
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
 
     # --- Blueprints ---
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -31,10 +32,6 @@ def create_app():
     @app.get("/")
     def home():
         return render_template("index.html")
-
-    # --- Create DB tables on first run ---
-    with app.app_context():
-        db.create_all()
 
     return app
 
