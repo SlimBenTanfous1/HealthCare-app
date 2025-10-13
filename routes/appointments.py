@@ -10,9 +10,15 @@ appointments_bp = Blueprint("appointments", __name__)
 def list_appointments():
     items = Appointment.query.order_by(Appointment.id.desc()).all()
     return jsonify([
-        {"id": a.id, "patient_id": a.patient_id, "date": a.date, "note": a.note}
+        {
+            "id": a.id,
+            "patient_id": a.patient_id,
+            "date": a.date,
+            "note": a.note
+        }
         for a in items
     ]), 200
+
 
 @appointments_bp.post("/")
 @jwt_required()
@@ -22,21 +28,28 @@ def create_appointment():
     date = (data.get("date") or "").strip()
     note = (data.get("note") or "").strip()
 
+    # Validation basique
     if not isinstance(patient_id, int) or not date:
-      return jsonify({"error": "patient_id (int) and date (string) are required"}), 400
+        return jsonify({"error": "patient_id (int) and date (string) are required"}), 400
 
-    if not Patient.query.get(patient_id):
-      return jsonify({"error": "patient not found"}), 404
+    # Vérification que le patient existe
+    patient = db.session.get(Patient, patient_id)
+    if not patient:
+        return jsonify({"error": "patient not found"}), 404
 
     a = Appointment(patient_id=patient_id, date=date, note=note)
     db.session.add(a)
     db.session.commit()
     return jsonify({"id": a.id}), 201
 
+
 @appointments_bp.delete("/<int:aid>")
 @jwt_required()
 def delete_appointment(aid: int):
-    a = Appointment.query.get_or_404(aid)
+    a = db.session.get(Appointment, aid)
+    if not a:
+        return jsonify({"error": "appointment not found"}), 404
+
     db.session.delete(a)
     db.session.commit()
     return jsonify({"message": "deleted"}), 200

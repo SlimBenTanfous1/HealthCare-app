@@ -20,9 +20,15 @@ def test_register_and_login(client):
     assert "access_token" in data
 
 def test_register_existing_user(client):
+    # Première inscription (ok)
+    response = client.post("/auth/register", json={"username": "slim", "password": "test"})
+    assert response.status_code == 201
+
+    # Deuxième inscription avec le même username → doit échouer
     response = client.post("/auth/register", json={"username": "slim", "password": "test"})
     assert response.status_code == 400
-    assert "already exists" in response.get_json()["error"]
+    assert response.get_json()["error"] == "username already exists"
+
 
 def test_login_invalid(client):
     response = client.post("/auth/login", json={"username": "ghost", "password": "wrong"})

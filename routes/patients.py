@@ -33,11 +33,19 @@ def create_patient():
     db.session.commit()
     return jsonify({"id": p.id}), 201
 
-@patients_bp.get("/<int:id>")
+@patients_bp.get("/<int:pid>")
 @jwt_required()
 def get_patient(pid: int):
-    p = Patient.query.get_or_404(pid)
-    return jsonify({"id": p.id, "name": p.name, "age": p.age, "diagnosis": p.diagnosis}), 200
+    p = db.session.get(Patient, pid)
+    if not p:
+        return jsonify({"error": "patient not found"}), 404
+    return jsonify({
+        "id": p.id,
+        "name": p.name,
+        "age": p.age,
+        "diagnosis": p.diagnosis
+    }), 200
+
 
 
 @patients_bp.put("/<int:id>")
