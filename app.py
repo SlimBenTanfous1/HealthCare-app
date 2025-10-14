@@ -6,6 +6,7 @@ from routes.auth import auth_bp
 from routes.patients import patients_bp
 from routes.appointments import appointments_bp
 from flasgger import Swagger
+from commands.seed import seed
 
 load_dotenv()  # Charge .env si présent
 
@@ -27,7 +28,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
-
+    app.cli.add_command(seed)
     # --- Register blueprints ---
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(patients_bp, url_prefix="/patients")
