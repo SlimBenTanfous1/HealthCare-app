@@ -1,12 +1,14 @@
 import pytest
 from app import create_app, db
+from models import Patient
+
 
 @pytest.fixture
 def app():
     app = create_app()
     app.config.update({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",  # ⚡ garanti mémoire
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "JWT_SECRET_KEY": "test-secret",
     })
@@ -14,6 +16,9 @@ def app():
     with app.app_context():
         db.drop_all()
         db.create_all()
+        # Seed un patient par défaut pour tests
+        db.session.add(Patient(name="John Doe", age=30, diagnosis="Healthy"))
+        db.session.commit()
     yield app
 
 
