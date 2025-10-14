@@ -119,10 +119,10 @@ docker ps
 ## 📸 Screenshots
 
 ### Dashboard  
-![dashboard](./docs/screens/dashboard.png)
+![dashboard](/templates/Dashboard.png)
 
 ### Swagger UI  
-![swagger](./docs/screens/swagger.png)
+![swagger](/templates/swagger.png)
 
 ---
 
