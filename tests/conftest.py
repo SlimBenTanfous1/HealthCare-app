@@ -4,20 +4,18 @@ from app import create_app, db
 @pytest.fixture
 def app():
     app = create_app()
-    # ⚡ Override toute config par défaut
     app.config.update({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",  # ⚡ garanti mémoire
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "JWT_SECRET_KEY": "test-secret",
     })
 
     with app.app_context():
-        db.drop_all()   # reset propre
-        db.create_all()
-        yield app
-        db.session.remove()
         db.drop_all()
+        db.create_all()
+    yield app
+
 
 @pytest.fixture
 def client(app):

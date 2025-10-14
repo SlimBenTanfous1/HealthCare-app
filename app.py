@@ -9,24 +9,17 @@ from routes.appointments import appointments_bp
 load_dotenv()  # loads .env if present
 
 def create_app():
-    app = Flask(__name__, template_folder="templates", static_folder="static")
+    app = Flask(__name__)
 
-    # --- Config ---
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL", "sqlite:///instance/healthcare.db"
-    )
+    # ⚡ Priorité à la variable d’env du CI/CD
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///instance/healthcare.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "CHANGE_ME_IN_PROD")  # set in env in real deploy
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "dev-secret")
 
-    # --- Init extensions ---
     db.init_app(app)
-    jwt.init_app(app)
-    migrate.init_app(app, db)
 
-    # --- Blueprints ---
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(patients_bp, url_prefix="/patients")
-    app.register_blueprint(appointments_bp, url_prefix="/appointments")
+    # enregistre les blueprints...
+    return app
 
     # --- Simple home page ---
     @app.get("/")
