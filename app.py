@@ -7,12 +7,15 @@ from routes.patients import patients_bp
 from routes.appointments import appointments_bp
 from flasgger import Swagger
 from commands.seed import seed
+import logging
 
 load_dotenv()  # Charge .env si présent
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 def create_app():
     app = Flask(__name__)
-    Swagger(app)
+    Swagger(app, template_file="swagger.yml")
+
 
     # --- DB Config ---
     db_url = os.getenv("DATABASE_URL") or os.getenv("SQLALCHEMY_DATABASE_URI")

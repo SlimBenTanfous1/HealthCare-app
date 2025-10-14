@@ -2,140 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Healthcare App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h2 { color: #2c3e50; }
-    .container { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
-    input, button { padding: 8px; margin: 5px; }
-    .success { color: green; }
-    .error { color: red; }
-    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Healthcare Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>🏥 Healthcare Dashboard</h1>
+<body class="bg-light">
 
-  <!-- Register -->
-  <div class="container">
-    <h2>Register</h2>
-    <input type="text" id="reg_username" placeholder="Username">
-    <input type="password" id="reg_password" placeholder="Password">
-    <button onclick="register()">Register</button>
-    <p id="reg_msg"></p>
-  </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">🏥 Healthcare Dashboard</a>
+      <button class="btn btn-outline-light ms-auto" id="logoutBtn" style="display: none;">Logout</button>
+    </div>
+  </nav>
 
-  <!-- Login -->
-  <div class="container">
-    <h2>Login</h2>
-    <input type="text" id="login_username" placeholder="Username">
-    <input type="password" id="login_password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <p id="login_msg"></p>
-  </div>
+  <div class="container mt-4">
 
-  <!-- Patients -->
-  <div class="container">
-    <h2>Patients</h2>
-    <input type="text" id="patient_name" placeholder="Name">
-    <input type="number" id="patient_age" placeholder="Age">
-    <input type="text" id="patient_diagnosis" placeholder="Diagnosis">
-    <button onclick="addPatient()">Add Patient</button>
-    <button onclick="listPatients()">List Patients</button>
-    <pre id="patients_list"></pre>
-  </div>
+    <!-- Alerts -->
+    <div id="alertBox"></div>
 
-  <!-- Appointments -->
-  <div class="container">
-    <h2>Appointments</h2>
-    <input type="number" id="appt_patient_id" placeholder="Patient ID">
-    <input type="date" id="appt_date">
-    <input type="text" id="appt_note" placeholder="Reason / Note">
-    <button onclick="addAppointment()">Add Appointment</button>
-    <button onclick="listAppointments()">List Appointments</button>
-    <pre id="appointments_list"></pre>
+    <!-- Register -->
+    <div class="card mb-4">
+      <div class="card-header fw-bold">Register</div>
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-4"><input id="regUser" type="text" class="form-control" placeholder="Username"></div>
+          <div class="col-md-4"><input id="regPass" type="password" class="form-control" placeholder="Password"></div>
+          <div class="col-md-4"><button class="btn btn-success w-100" onclick="register()">Register</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div class="card mb-4">
+      <div class="card-header fw-bold">Login</div>
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-4"><input id="logUser" type="text" class="form-control" placeholder="Username"></div>
+          <div class="col-md-4"><input id="logPass" type="password" class="form-control" placeholder="Password"></div>
+          <div class="col-md-4"><button class="btn btn-primary w-100" onclick="login()">Login</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patients -->
+    <div class="card mb-4">
+      <div class="card-header fw-bold">Patients</div>
+      <div class="card-body">
+        <div class="row g-2 mb-2">
+          <div class="col-md-3"><input id="pName" type="text" class="form-control" placeholder="Name"></div>
+          <div class="col-md-2"><input id="pAge" type="number" class="form-control" placeholder="Age"></div>
+          <div class="col-md-4"><input id="pDiag" type="text" class="form-control" placeholder="Diagnosis"></div>
+          <div class="col-md-3"><button class="btn btn-success w-100" onclick="addPatient()">Add Patient</button></div>
+        </div>
+        <button class="btn btn-outline-secondary" onclick="listPatients()">List Patients</button>
+        <ul id="patientsList" class="list-group mt-3"></ul>
+      </div>
+    </div>
+
+    <!-- Appointments -->
+    <div class="card mb-4">
+      <div class="card-header fw-bold">Appointments</div>
+      <div class="card-body">
+        <div class="row g-2 mb-2">
+          <div class="col-md-2"><input id="aPid" type="number" class="form-control" placeholder="Patient ID"></div>
+          <div class="col-md-3"><input id="aDate" type="date" class="form-control"></div>
+          <div class="col-md-4"><input id="aNote" type="text" class="form-control" placeholder="Reason / Note"></div>
+          <div class="col-md-3"><button class="btn btn-success w-100" onclick="addAppointment()">Add Appointment</button></div>
+        </div>
+        <button class="btn btn-outline-secondary" onclick="listAppointments()">List Appointments</button>
+        <ul id="appointmentsList" class="list-group mt-3"></ul>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    let token = "";
+    const API_BASE = ""; // ton API est servie par Flask directement
+    let token = localStorage.getItem("token");
+
+    function showAlert(msg, type="success") {
+      document.getElementById("alertBox").innerHTML =
+        `<div class="alert alert-${type} alert-dismissible fade show">${msg}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    }
 
     async function register() {
-      const username = document.getElementById("reg_username").value;
-      const password = document.getElementById("reg_password").value;
       const res = await fetch("/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username: regUser.value, password: regPass.value})
       });
-      document.getElementById("reg_msg").innerText =
-        res.status === 201 ? "✅ Registered successfully" : "⚠️ Failed: " + res.status;
+      if (res.ok) showAlert("User registered!", "success");
+      else showAlert("Register failed", "danger");
     }
 
     async function login() {
-      const username = document.getElementById("login_username").value;
-      const password = document.getElementById("login_password").value;
       const res = await fetch("/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username: logUser.value, password: logPass.value})
       });
       const data = await res.json();
-      if (data.access_token) {
+      if (res.ok && data.access_token) {
         token = data.access_token;
-        document.getElementById("login_msg").innerText = "✅ Logged in. Token saved.";
+        localStorage.setItem("token", token);
+        document.getElementById("logoutBtn").style.display="inline-block";
+        showAlert("Login successful!");
       } else {
-        document.getElementById("login_msg").innerText = "⚠️ Login failed";
+        showAlert("Login failed", "danger");
       }
     }
 
+    function logout() {
+      token = null;
+      localStorage.removeItem("token");
+      document.getElementById("logoutBtn").style.display="none";
+      showAlert("Logged out", "info");
+    }
+    document.getElementById("logoutBtn").onclick = logout;
+
     async function addPatient() {
-      const name = document.getElementById("patient_name").value;
-      const age = parseInt(document.getElementById("patient_age").value);
-      const diagnosis = document.getElementById("patient_diagnosis").value;
       const res = await fetch("/patients/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ name, age, diagnosis })
+        headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token},
+        body: JSON.stringify({name: pName.value, age: parseInt(pAge.value), diagnosis: pDiag.value})
       });
-      const data = await res.json();
-      alert("Added patient with ID: " + data.id);
+      if (res.ok) showAlert("Patient added!");
+      else showAlert("Failed to add patient", "danger");
     }
 
     async function listPatients() {
-      const res = await fetch("/patients/", {
-        headers: { "Authorization": "Bearer " + token }
-      });
+      const res = await fetch("/patients/", {headers: {"Authorization": "Bearer " + token}});
       const data = await res.json();
-      document.getElementById("patients_list").innerText = JSON.stringify(data, null, 2);
+      patientsList.innerHTML = data.map(p => `<li class="list-group-item">#${p.id} - ${p.name}, ${p.age} (${p.diagnosis})</li>`).join("");
     }
 
     async function addAppointment() {
-      const patient_id = parseInt(document.getElementById("appt_patient_id").value);
-      const date = document.getElementById("appt_date").value;
-      const note = document.getElementById("appt_note").value;
       const res = await fetch("/appointments/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ patient_id, date, note })
+        headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token},
+        body: JSON.stringify({patient_id: parseInt(aPid.value), date: aDate.value, note: aNote.value})
       });
-      const data = await res.json();
-      alert("Added appointment with ID: " + data.id);
+      if (res.ok) showAlert("Appointment added!");
+      else showAlert("Failed to add appointment", "danger");
     }
 
     async function listAppointments() {
-      const res = await fetch("/appointments/", {
-        headers: { "Authorization": "Bearer " + token }
-      });
+      const res = await fetch("/appointments/", {headers: {"Authorization": "Bearer " + token}});
       const data = await res.json();
-      document.getElementById("appointments_list").innerText = JSON.stringify(data, null, 2);
+      appointmentsList.innerHTML = data.map(a => `<li class="list-group-item">#${a.id} - Patient ${a.patient_id}, ${a.date} (${a.note})</li>`).join("");
     }
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

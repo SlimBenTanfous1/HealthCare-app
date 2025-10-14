@@ -1,0 +1,130 @@
+swagger: "2.0"
+info:
+  title: HealthCare API
+  description: API for managing patients, appointments and authentication.
+  version: "1.0.0"
+
+host: localhost:5000
+basePath: /
+schemes:
+  - http
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        201:
+          description: User created
+        400:
+          description: Username already exists
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login user
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: JWT access token returned
+        401:
+          description: Invalid credentials
+
+  /patients/:
+    get:
+      tags:
+        - Patients
+      summary: List all patients
+      responses:
+        200:
+          description: List of patients
+    post:
+      tags:
+        - Patients
+      summary: Create new patient
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Patient'
+      responses:
+        201:
+          description: Patient created
+
+  /appointments/:
+    get:
+      tags:
+        - Appointments
+      summary: List all appointments
+      responses:
+        200:
+          description: List of appointments
+    post:
+      tags:
+        - Appointments
+      summary: Create new appointment
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Appointment'
+      responses:
+        201:
+          description: Appointment created
+
+definitions:
+  Patient:
+    type: object
+    properties:
+      name:
+        type: string
+      age:
+        type: integer
+      diagnosis:
+        type: string
+      email:
+        type: string
+
+  Appointment:
+    type: object
+    properties:
+      patient_id:
+        type: integer
+      date:
+        type: string
+      note:
+        type: string
