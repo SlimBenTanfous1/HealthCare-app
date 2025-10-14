@@ -1,22 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Healthcare API</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Healthcare App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { color: #2c3e50; }
+    .container { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+    input, button { padding: 8px; margin: 5px; }
+    .success { color: green; }
+    .error { color: red; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
 </head>
 <body>
-  <h2>Healthcare API</h2>
-  <p>Endpoints:</p>
-  <ul>
-    <li>POST /auth/register</li>
-    <li>POST /auth/login</li>
-    <li>GET /auth/me (JWT)</li>
-    <li>GET/POST /patients (JWT)</li>
-    <li>GET/PUT/DELETE /patients/&lt;id&gt; (JWT)</li>
-    <li>GET/POST/DELETE /appointments (JWT)</li>
-  </ul>
+  <h1>🏥 Healthcare Dashboard</h1>
+
+  <!-- Register -->
+  <div class="container">
+    <h2>Register</h2>
+    <input type="text" id="reg_username" placeholder="Username">
+    <input type="password" id="reg_password" placeholder="Password">
+    <button onclick="register()">Register</button>
+    <p id="reg_msg"></p>
+  </div>
+
+  <!-- Login -->
+  <div class="container">
+    <h2>Login</h2>
+    <input type="text" id="login_username" placeholder="Username">
+    <input type="password" id="login_password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="login_msg"></p>
+  </div>
+
+  <!-- Patients -->
+  <div class="container">
+    <h2>Patients</h2>
+    <input type="text" id="patient_name" placeholder="Name">
+    <input type="number" id="patient_age" placeholder="Age">
+    <input type="text" id="patient_diagnosis" placeholder="Diagnosis">
+    <button onclick="addPatient()">Add Patient</button>
+    <button onclick="listPatients()">List Patients</button>
+    <pre id="patients_list"></pre>
+  </div>
+
+  <!-- Appointments -->
+  <div class="container">
+    <h2>Appointments</h2>
+    <input type="number" id="appt_patient_id" placeholder="Patient ID">
+    <input type="date" id="appt_date">
+    <input type="text" id="appt_note" placeholder="Reason / Note">
+    <button onclick="addAppointment()">Add Appointment</button>
+    <button onclick="listAppointments()">List Appointments</button>
+    <pre id="appointments_list"></pre>
+  </div>
+
+  <script>
+    let token = "";
+
+    async function register() {
+      const username = document.getElementById("reg_username").value;
+      const password = document.getElementById("reg_password").value;
+      const res = await fetch("/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      document.getElementById("reg_msg").innerText =
+        res.status === 201 ? "✅ Registered successfully" : "⚠️ Failed: " + res.status;
+    }
+
+    async function login() {
+      const username = document.getElementById("login_username").value;
+      const password = document.getElementById("login_password").value;
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.access_token) {
+        token = data.access_token;
+        document.getElementById("login_msg").innerText = "✅ Logged in. Token saved.";
+      } else {
+        document.getElementById("login_msg").innerText = "⚠️ Login failed";
+      }
+    }
+
+    async function addPatient() {
+      const name = document.getElementById("patient_name").value;
+      const age = parseInt(document.getElementById("patient_age").value);
+      const diagnosis = document.getElementById("patient_diagnosis").value;
+      const res = await fetch("/patients/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ name, age, diagnosis })
+      });
+      const data = await res.json();
+      alert("Added patient with ID: " + data.id);
+    }
+
+    async function listPatients() {
+      const res = await fetch("/patients/", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const data = await res.json();
+      document.getElementById("patients_list").innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function addAppointment() {
+      const patient_id = parseInt(document.getElementById("appt_patient_id").value);
+      const date = document.getElementById("appt_date").value;
+      const note = document.getElementById("appt_note").value;
+      const res = await fetch("/appointments/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ patient_id, date, note })
+      });
+      const data = await res.json();
+      alert("Added appointment with ID: " + data.id);
+    }
+
+    async function listAppointments() {
+      const res = await fetch("/appointments/", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const data = await res.json();
+      document.getElementById("appointments_list").innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
 </body>
 </html>
-
-

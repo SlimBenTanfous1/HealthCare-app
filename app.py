@@ -5,11 +5,13 @@ from extensions import db, jwt, migrate
 from routes.auth import auth_bp
 from routes.patients import patients_bp
 from routes.appointments import appointments_bp
+from flasgger import Swagger
 
 load_dotenv()  # loads .env if present
 
 def create_app():
     app = Flask(__name__)
+    Swagger(app)
 
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
         "SQLALCHEMY_DATABASE_URI", "sqlite:///instance/healthcare.db"
