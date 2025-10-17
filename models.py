@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(db.Model):
+    __tablename__ = "users"  # ⚡ éviter le mot réservé 'user'
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
@@ -17,6 +19,8 @@ class User(db.Model):
 
 
 class Patient(db.Model):
+    __tablename__ = "patients"
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False, index=True)
     age = db.Column(db.Integer, nullable=False)
@@ -24,9 +28,12 @@ class Patient(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+
 class Appointment(db.Model):
+    __tablename__ = "appointments"
+
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False, index=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), nullable=False, index=True)
     date = db.Column(db.String(50), nullable=False)
     note = db.Column(db.String(255))
     patient = db.relationship("Patient", backref="appointments", lazy=True)
