@@ -14,7 +14,7 @@ pipeline {
                 git branch: 'master',
                     changelog: false,
                     credentialsId: 'GithubJenkins',
-                    url: 'https://github.com/SlimBenTanfous1/HealthCare-app.git'
+                    url: 'https://github.com/Slimbentanfous1/HealthCare-app.git'
             }
         }
 
