@@ -1,3 +1,4 @@
+import os
 import pytest
 from app import create_app, db
 from models import Patient
@@ -5,6 +6,8 @@ from models import Patient
 
 @pytest.fixture
 def app():
+    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+
     app = create_app()
     app.config.update({
         "TESTING": True,
