@@ -7,6 +7,6 @@ paths = [
   "venv/",
   "tests/",
   "__pycache__/",
-  ".gitignore",
-  "*.md"
+  "\\.gitignore$",
+  "\\*.md$"
 ]
