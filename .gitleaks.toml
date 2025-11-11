@@ -1,0 +1,12 @@
+title = "Custom Gitleaks Config"
+description = "Ignore common directories and files"
+
+[allowlist]
+description = "Files and paths to exclude from scans"
+paths = [
+  "venv/",
+  "tests/",
+  "__pycache__/",
+  ".gitignore",
+  "*.md"
+]
