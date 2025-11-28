@@ -19,3 +19,4 @@ def test_create_appointment_invalid(client, auth_headers):
     data = {"date": "2025-10-15"}
     response = client.post("/appointments/", json=data, headers=auth_headers)
     assert response.status_code == 400
+
