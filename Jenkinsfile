@@ -74,6 +74,41 @@ pipeline {
         }
     }
 }
+
+        stage('Secrets Scan - Gitleaks') {
+    steps {
+        echo "🕵️‍♂️ Scanning for exposed secrets..."
+        sh '''
+        echo "Installing Gitleaks (no sudo needed)..."
+        wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
+        tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
+        chmod +x gitleaks
+        mv gitleaks /tmp/
+
+        # Scan only your actual repo, excluding venv & other irrelevant files
+        /tmp/gitleaks detect --source=. \
+                        --no-git \
+                        --report-format=json \
+                        --report-path=gitleaks-report.json \
+                        --report-path=/var/lib/jenkins/workspace/DevSecOps/gitleaks-report.json
+       
+        if command -v jq >/dev/null 2>&1; then
+            leaks=$(cat /var/lib/jenkins/workspace/DevSecOps/gitleaks-report.json | jq 'length')
+            if [ "$leaks" -gt 0 ]; then
+                echo "⚠️  Gitleaks found $leaks potential secrets. Check gitleaks-report.json"
+                exit 1
+            else
+                echo "✅ No secrets found by Gitleaks!"
+            fi
+        else
+            echo "⚠️ jq not installed, skipping leak count check."
+        fi
+        '''
+        
+    }
+    
+}
+
         stage('Docker Image Scan - Trivy') {
     steps {
         echo '🐳 Scanning Docker image with Trivy...'
@@ -137,41 +172,36 @@ pipeline {
         }
             }
         }
-
-        stage('Secrets Scan - Gitleaks') {
-    steps {
-        echo "🕵️‍♂️ Scanning for exposed secrets..."
-        sh '''
-        echo "Installing Gitleaks (no sudo needed)..."
-        wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
-        tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
-        chmod +x gitleaks
-        mv gitleaks /tmp/
-
-        # Scan only your actual repo, excluding venv & other irrelevant files
-        /tmp/gitleaks detect --source=. \
-                        --no-git \
-                        --report-format=json \
-                        --report-path=gitleaks-report.json \
-                        --report-path=/var/lib/jenkins/workspace/DevSecOps/gitleaks-report.json
-       
-        if command -v jq >/dev/null 2>&1; then
-            leaks=$(cat /var/lib/jenkins/workspace/DevSecOps/gitleaks-report.json | jq 'length')
-            if [ "$leaks" -gt 0 ]; then
-                echo "⚠️  Gitleaks found $leaks potential secrets. Check gitleaks-report.json"
-                exit 1
-            else
-                echo "✅ No secrets found by Gitleaks!"
-            fi
-        else
-            echo "⚠️ jq not installed, skipping leak count check."
-        fi
-        '''
         
-    }
-    
-}
+        stage('Deploy Application - Local Docker') {
+            steps {
+                echo '🚀 Deploying Healthcare App to Local Environment...'
 
+                sh '''
+                echo "Stopping old production container..."
+                docker stop healthcare-prod || true
+                docker rm healthcare-prod || true
+
+                echo "Starting new production container on port 8080..."
+                docker run -d \
+                    -p 8080:5000 \
+                    --name healthcare-prod \
+                    slimbentanfous1/healthcare-app:latest
+
+                echo "✅ Deployment completed successfully!"
+                '''
+
+                // Optional basic health check
+                script {
+                    def status = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080", returnStdout: true).trim()
+                    if (status != "200") {
+                        error("❌ Deployment failed! Health check returned HTTP ${status}")
+                    } else {
+                        echo "🟢 Deployment health check passed (HTTP 200)."
+                    }
+                }
+            }
+        }
 
 
         stage('Report Summary') {
